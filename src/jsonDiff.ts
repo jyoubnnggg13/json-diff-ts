@@ -1,4 +1,4 @@
-import { difference, find, intersection, keyBy } from 'lodash';
+import { difference, find, intersection, keyBy, round } from 'lodash';
 import { splitJSONPath } from './helpers';
 
 type FunctionKey = (obj: any, shouldReturnKeyName?: boolean) => any;
@@ -386,6 +386,7 @@ const compare = (oldObj: any, newObj: any, path: any, keyPath: any, options: Opt
           changes.push({
             type: Operation.UPDATE,
             key: getKey(path),
+            oldObj: oldObj,
             changes: diffs
           });
         } else {
@@ -534,6 +535,10 @@ const convertArrayToObj = (arr: any[], uniqKey: any) => {
 
 const comparePrimitives = (oldObj: any, newObj: any, path: any) => {
   const changes = [];
+  if (typeof oldObj == 'number' || typeof newObj == 'number') {
+    oldObj = round(oldObj, 5);
+    newObj = round(newObj, 5);
+  }
   if (oldObj !== newObj) {
     changes.push({
       type: Operation.UPDATE,
